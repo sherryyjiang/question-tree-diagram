@@ -56,9 +56,11 @@ export function CanvasTree() {
     addResponseOption,
     updateResponseOption,
     deleteResponseOption,
+    addBranch1Question,
     updateBranch1Question,
-    addBranch1ResponseOption,
-    deleteBranch1ResponseOption,
+    deleteBranch1Question,
+    addExplorationArea,
+    deleteExplorationArea,
     updateExplorationGoal,
     addBehavioralDimension,
     updateBehavioralDimension,
@@ -576,9 +578,11 @@ export function CanvasTree() {
               addResponseOption={addResponseOption}
               updateResponseOption={updateResponseOption}
               deleteResponseOption={deleteResponseOption}
+              addBranch1Question={addBranch1Question}
               updateBranch1Question={updateBranch1Question}
-              addBranch1ResponseOption={addBranch1ResponseOption}
-              deleteBranch1ResponseOption={deleteBranch1ResponseOption}
+              deleteBranch1Question={deleteBranch1Question}
+              addExplorationArea={addExplorationArea}
+              deleteExplorationArea={deleteExplorationArea}
               updateExplorationGoal={updateExplorationGoal}
               addBehavioralDimension={addBehavioralDimension}
               updateBehavioralDimension={updateBehavioralDimension}
@@ -622,9 +626,11 @@ interface CategoryNodesProps {
   addResponseOption: (categoryId: string, label: string) => void;
   updateResponseOption: (categoryId: string, optionId: string, label: string) => void;
   deleteResponseOption: (categoryId: string, optionId: string) => void;
+  addBranch1Question: (categoryId: string, optionId: string) => void;
   updateBranch1Question: (categoryId: string, optionId: string, text: string) => void;
-  addBranch1ResponseOption: (categoryId: string, optionId: string, label: string) => void;
-  deleteBranch1ResponseOption: (categoryId: string, optionId: string, responseId: string) => void;
+  deleteBranch1Question: (categoryId: string, optionId: string) => void;
+  addExplorationArea: (categoryId: string, optionId: string) => void;
+  deleteExplorationArea: (categoryId: string, optionId: string) => void;
   updateExplorationGoal: (categoryId: string, optionId: string, goal: string) => void;
   addBehavioralDimension: (categoryId: string, optionId: string, name: string) => void;
   updateBehavioralDimension: (categoryId: string, optionId: string, dimensionId: string, name: string) => void;
@@ -643,8 +649,11 @@ function CategoryNodes({
   addResponseOption,
   updateResponseOption,
   deleteResponseOption,
+  addBranch1Question,
   updateBranch1Question,
-  addBranch1ResponseOption,
+  deleteBranch1Question,
+  addExplorationArea,
+  deleteExplorationArea,
   updateExplorationGoal,
   addBehavioralDimension,
   updateBehavioralDimension,
@@ -682,8 +691,11 @@ function CategoryNodes({
           updateNodePosition={updateNodePosition}
           updateResponseOption={updateResponseOption}
           deleteResponseOption={deleteResponseOption}
+          addBranch1Question={addBranch1Question}
           updateBranch1Question={updateBranch1Question}
-          addBranch1ResponseOption={addBranch1ResponseOption}
+          deleteBranch1Question={deleteBranch1Question}
+          addExplorationArea={addExplorationArea}
+          deleteExplorationArea={deleteExplorationArea}
           updateExplorationGoal={updateExplorationGoal}
           addBehavioralDimension={addBehavioralDimension}
           updateBehavioralDimension={updateBehavioralDimension}
@@ -705,8 +717,11 @@ interface ResponseNodesProps {
   updateNodePosition: (nodeId: string, pos: NodePosition) => void;
   updateResponseOption: (categoryId: string, optionId: string, label: string) => void;
   deleteResponseOption: (categoryId: string, optionId: string) => void;
+  addBranch1Question: (categoryId: string, optionId: string) => void;
   updateBranch1Question: (categoryId: string, optionId: string, text: string) => void;
-  addBranch1ResponseOption: (categoryId: string, optionId: string, label: string) => void;
+  deleteBranch1Question: (categoryId: string, optionId: string) => void;
+  addExplorationArea: (categoryId: string, optionId: string) => void;
+  deleteExplorationArea: (categoryId: string, optionId: string) => void;
   updateExplorationGoal: (categoryId: string, optionId: string, goal: string) => void;
   addBehavioralDimension: (categoryId: string, optionId: string, name: string) => void;
   updateBehavioralDimension: (categoryId: string, optionId: string, dimensionId: string, name: string) => void;
@@ -723,8 +738,11 @@ function ResponseNodes({
   updateNodePosition,
   updateResponseOption,
   deleteResponseOption,
+  addBranch1Question,
   updateBranch1Question,
-  addBranch1ResponseOption,
+  deleteBranch1Question,
+  addExplorationArea,
+  deleteExplorationArea,
   updateExplorationGoal,
   addBehavioralDimension,
   updateBehavioralDimension,
@@ -741,7 +759,7 @@ function ResponseNodes({
 
   return (
     <>
-      {/* Response */}
+      {/* Response - shows Add button if no branch question yet */}
       <CanvasNode
         id={respId}
         label={option.label}
@@ -750,10 +768,11 @@ function ResponseNodes({
         onPositionChange={(pos) => updateNodePosition(respId, pos)}
         onUpdate={(label) => updateResponseOption(categoryId, option.id, label)}
         onDelete={() => deleteResponseOption(categoryId, option.id)}
+        onAdd={!branch1 ? () => addBranch1Question(categoryId, option.id) : undefined}
         childIds={branch1 ? [`branch-${branch1.id}`] : []}
       />
 
-      {/* Branch 1 */}
+      {/* Branch 1 - shows Add button if no exploration yet */}
       {branch1 && (
         <CanvasNode
           id={`branch-${branch1.id}`}
@@ -763,7 +782,8 @@ function ResponseNodes({
           position={nodePositions.get(`branch-${branch1.id}`) || { x: 0, y: 0 }}
           onPositionChange={(pos) => updateNodePosition(`branch-${branch1.id}`, pos)}
           onUpdate={(text) => updateBranch1Question(categoryId, option.id, text)}
-          onAdd={() => addBranch1ResponseOption(categoryId, option.id, 'New option')}
+          onDelete={() => deleteBranch1Question(categoryId, option.id)}
+          onAdd={!exp ? () => addExplorationArea(categoryId, option.id) : undefined}
           childIds={exp ? [`exp-${exp.id}`] : []}
         />
       )}
@@ -778,7 +798,8 @@ function ResponseNodes({
           position={nodePositions.get(`exp-${exp.id}`) || { x: 0, y: 0 }}
           onPositionChange={(pos) => updateNodePosition(`exp-${exp.id}`, pos)}
           onUpdate={(goal) => updateExplorationGoal(categoryId, option.id, goal)}
-          onAdd={() => addBehavioralDimension(categoryId, option.id, 'new-dimension')}
+          onDelete={() => deleteExplorationArea(categoryId, option.id)}
+          onAdd={() => addBehavioralDimension(categoryId, option.id, 'New dimension')}
           childIds={dims.map((d) => `dim-${d.id}`)}
         />
       )}

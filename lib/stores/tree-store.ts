@@ -36,7 +36,13 @@ interface TreeState {
   deleteResponseOption: (categoryId: string, optionId: string) => void;
 
   // Branch 1 question actions
+  addBranch1Question: (categoryId: string, optionId: string) => void;
   updateBranch1Question: (categoryId: string, optionId: string, text: string) => void;
+  deleteBranch1Question: (categoryId: string, optionId: string) => void;
+
+  // Exploration area actions
+  addExplorationArea: (categoryId: string, optionId: string) => void;
+  deleteExplorationArea: (categoryId: string, optionId: string) => void;
   addBranch1ResponseOption: (categoryId: string, optionId: string, label: string) => void;
   updateBranch1ResponseOption: (
     categoryId: string,
@@ -210,7 +216,7 @@ export const useTreeStore = create<TreeState>()(
           },
         })),
 
-      // Response option actions
+      // Response option actions - creates just the response, no nested structure
       addResponseOption: (categoryId, label) =>
         set((state) => ({
           tree: {
@@ -226,25 +232,75 @@ export const useTreeStore = create<TreeState>()(
                         {
                           id: generateId(),
                           label,
-                          branch1Question: {
-                            id: generateId(),
-                            text: 'Enter context-gathering question...',
-                            type: 'context-gathering' as const,
-                            isFixed: true,
-                            responseOptions: [],
-                            explorationArea: {
-                              id: generateId(),
-                              goal: 'Enter exploration goal...',
-                              behavioralDimensions: [],
-                            },
-                            evaluationArea: {
-                              id: generateId(),
-                              evaluationDimensions: [],
-                              conclusionHints: [],
-                            },
-                          },
+                          // No branch1Question - user adds it incrementally
                         },
                       ],
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      // Add branch question to a response option
+      addBranch1Question: (categoryId, optionId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && !o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                id: generateId(),
+                                text: 'Enter context-gathering question...',
+                                type: 'context-gathering' as const,
+                                isFixed: true,
+                                responseOptions: [],
+                                // No explorationArea - user adds it incrementally
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      // Add exploration area to a branch question
+      addExplorationArea: (categoryId, optionId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question && !o.branch1Question.explorationArea
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                explorationArea: {
+                                  id: generateId(),
+                                  goal: 'Enter exploration goal...',
+                                  behavioralDimensions: [],
+                                },
+                              },
+                            }
+                          : o
+                      ),
                     },
                   }
                 : c
@@ -284,6 +340,58 @@ export const useTreeStore = create<TreeState>()(
                       ...c.entryQuestion,
                       responseOptions: c.entryQuestion.responseOptions.filter(
                         (o) => o.id !== optionId
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      // Delete branch1 question from a response option
+      deleteBranch1Question: (categoryId, optionId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId
+                          ? { ...o, branch1Question: undefined }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      // Delete exploration area from a branch question
+      deleteExplorationArea: (categoryId, optionId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                explorationArea: undefined,
+                              },
+                            }
+                          : o
                       ),
                     },
                   }
