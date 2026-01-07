@@ -1,5 +1,5 @@
-import { HorizontalTree } from '@/components/tree/horizontal-tree';
+import { CanvasTree } from '@/components/tree/canvas-tree';
 
 export default function Home() {
-  return <HorizontalTree />;
+  return <CanvasTree />;
 }
