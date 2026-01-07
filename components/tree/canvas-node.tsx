@@ -145,8 +145,8 @@ export function CanvasNode({
       )}
       style={{
         transform: `translate(${position.x}px, ${position.y}px)`,
-        minWidth: isExpanded ? '300px' : '180px',
-        maxWidth: isExpanded ? '450px' : '200px',
+        minWidth: isExpanded ? '350px' : '260px',
+        maxWidth: isExpanded ? '500px' : '300px',
       }}
     >
       {/* Header with drag handle */}

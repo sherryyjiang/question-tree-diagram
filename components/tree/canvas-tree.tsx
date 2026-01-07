@@ -2,11 +2,11 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useDrag } from '@use-gesture/react';
-import { Plus, Download, Upload, RotateCcw, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Plus, Download, Upload, RotateCcw, ZoomIn, ZoomOut, Maximize2, Undo2, Redo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTreeStore } from '@/lib/stores/tree-store';
 import { CanvasNode } from './canvas-node';
-import type { Category, ResponseOption, BehavioralDimension } from '@/lib/types/question-tree';
+import type { Category, ResponseOption, BehavioralDimension, QuestionTree } from '@/lib/types/question-tree';
 
 interface NodePosition {
   x: number;
@@ -19,12 +19,20 @@ interface Connection {
 }
 
 // Layout constants
-const NODE_WIDTH = 200;
-const NODE_HEIGHT = 100;
+const NODE_WIDTH = 280;
+const NODE_HEIGHT = 90;
 const H_GAP = 40;
-const V_GAP = 20;
+const V_GAP = 25;
 const INITIAL_X = 40;
 const INITIAL_Y = 60;
+
+// History for undo/redo
+interface HistoryState {
+  tree: QuestionTree;
+  positions: Map<string, NodePosition>;
+}
+
+const MAX_HISTORY = 50;
 
 export function CanvasTree() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -33,6 +41,11 @@ export function CanvasTree() {
   const [zoom, setZoom] = useState(1);
   const [nodePositions, setNodePositions] = useState<Map<string, NodePosition>>(new Map());
   const [connections, setConnections] = useState<Connection[]>([]);
+  
+  // Undo/redo history
+  const [history, setHistory] = useState<HistoryState[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const isUndoRedo = useRef(false);
 
   const {
     tree,
@@ -56,7 +69,7 @@ export function CanvasTree() {
     resetToSample,
   } = useTreeStore();
 
-  // Canvas panning
+  // Canvas panning via drag
   const bindCanvas = useDrag(
     ({ offset: [x, y], event }) => {
       // Only pan if clicking on canvas background, not nodes
@@ -67,6 +80,96 @@ export function CanvasTree() {
       from: () => [canvasOffset.x, canvasOffset.y],
     }
   );
+
+  // Scroll wheel for panning
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    // Shift+scroll for horizontal, normal scroll for vertical
+    if (e.shiftKey) {
+      setCanvasOffset((prev) => ({
+        x: prev.x - e.deltaY,
+        y: prev.y,
+      }));
+    } else {
+      setCanvasOffset((prev) => ({
+        x: prev.x - e.deltaX,
+        y: prev.y - e.deltaY,
+      }));
+    }
+  }, []);
+
+  // Save to history when tree changes
+  useEffect(() => {
+    if (isUndoRedo.current) {
+      isUndoRedo.current = false;
+      return;
+    }
+    
+    // Add to history
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push({
+        tree: JSON.parse(JSON.stringify(tree)),
+        positions: new Map(nodePositions),
+      });
+      // Limit history size
+      if (newHistory.length > MAX_HISTORY) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex((prev) => Math.min(prev + 1, MAX_HISTORY - 1));
+  }, [tree]);
+
+  // Undo function
+  const handleUndo = useCallback(() => {
+    if (historyIndex <= 0) return;
+    
+    isUndoRedo.current = true;
+    const prevState = history[historyIndex - 1];
+    if (prevState) {
+      useTreeStore.setState({ tree: prevState.tree });
+      setNodePositions(new Map(prevState.positions));
+      setHistoryIndex(historyIndex - 1);
+    }
+  }, [history, historyIndex]);
+
+  // Redo function
+  const handleRedo = useCallback(() => {
+    if (historyIndex >= history.length - 1) return;
+    
+    isUndoRedo.current = true;
+    const nextState = history[historyIndex + 1];
+    if (nextState) {
+      useTreeStore.setState({ tree: nextState.tree });
+      setNodePositions(new Map(nextState.positions));
+      setHistoryIndex(historyIndex + 1);
+    }
+  }, [history, historyIndex]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
 
   // Calculate initial node positions based on tree structure
   const calculatePositions = useCallback(() => {
@@ -296,6 +399,34 @@ export function CanvasTree() {
           </div>
 
           <div className="flex items-center gap-1">
+            {/* Undo/Redo */}
+            <div className="flex items-center gap-0.5 mr-2 px-1 py-1 bg-white/5 rounded">
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className={cn(
+                  "p-1.5 rounded transition-colors",
+                  canUndo ? "hover:bg-white/10 text-white/70" : "text-white/20 cursor-not-allowed"
+                )}
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo2 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleRedo}
+                disabled={!canRedo}
+                className={cn(
+                  "p-1.5 rounded transition-colors",
+                  canRedo ? "hover:bg-white/10 text-white/70" : "text-white/20 cursor-not-allowed"
+                )}
+                title="Redo (Ctrl+Shift+Z or Ctrl+Y)"
+              >
+                <Redo2 className="h-4 w-4" />
+              </button>
+            </div>
+
             {/* Zoom controls */}
             <div className="flex items-center gap-0.5 mr-2 px-2 py-1 bg-white/5 rounded">
               <button
@@ -379,14 +510,15 @@ export function CanvasTree() {
             <span className="w-2.5 h-2.5 rounded bg-violet-900/70 border border-violet-500/60 border-dashed" />
             <span className="text-white/50">Probe</span>
           </div>
-          <span className="text-white/20 ml-4">Drag canvas to pan • Drag nodes to move • Double-click to edit • Click chevron to expand</span>
+          <span className="text-white/20 ml-4">Scroll or drag to pan • Drag nodes • Double-click to edit • Ctrl+Z undo</span>
         </div>
       </header>
 
       {/* Canvas Container */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-hidden cursor-grab active:cursor-grabbing"
+        className="flex-1 overflow-auto cursor-grab active:cursor-grabbing"
+        onWheel={handleWheel}
         {...bindCanvas()}
       >
         {/* Canvas with zoom and pan */}
