@@ -7,6 +7,8 @@ import type {
   ResponseOption,
   BranchQuestion,
   BranchResponseOption,
+  Branch2Question,
+  Branch2ResponseOption,
   ExplorationArea,
   EvaluationArea,
   BehavioralDimension,
@@ -53,6 +55,39 @@ interface TreeState {
   deleteBranch1ResponseOption: (
     categoryId: string,
     optionId: string,
+    responseId: string
+  ) => void;
+
+  // Branch 2 question actions
+  addBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string) => void;
+  updateBranch2Question: (
+    categoryId: string,
+    optionId: string,
+    branch1ResponseId: string,
+    text: string
+  ) => void;
+  deleteBranch2Question: (
+    categoryId: string,
+    optionId: string,
+    branch1ResponseId: string
+  ) => void;
+  addBranch2ResponseOption: (
+    categoryId: string,
+    optionId: string,
+    branch1ResponseId: string,
+    label: string
+  ) => void;
+  updateBranch2ResponseOption: (
+    categoryId: string,
+    optionId: string,
+    branch1ResponseId: string,
+    responseId: string,
+    label: string
+  ) => void;
+  deleteBranch2ResponseOption: (
+    categoryId: string,
+    optionId: string,
+    branch1ResponseId: string,
     responseId: string
   ) => void;
 
@@ -504,6 +539,255 @@ export const useTreeStore = create<TreeState>()(
                                   o.branch1Question.responseOptions.filter(
                                     (r) => r.id !== responseId
                                   ),
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      // Branch 2 question actions
+      addBranch2Question: (categoryId, optionId, branch1ResponseId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                responseOptions: o.branch1Question.responseOptions.map(
+                                  (r) =>
+                                    r.id === branch1ResponseId && !r.branch2Question
+                                      ? {
+                                          ...r,
+                                          branch2Question: {
+                                            id: generateId(),
+                                            text: 'Enter follow-up question...',
+                                            type: 'context-gathering' as const,
+                                            isFixed: true,
+                                            responseOptions: [],
+                                          },
+                                        }
+                                      : r
+                                ),
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      updateBranch2Question: (categoryId, optionId, branch1ResponseId, text) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                responseOptions: o.branch1Question.responseOptions.map(
+                                  (r) =>
+                                    r.id === branch1ResponseId && r.branch2Question
+                                      ? {
+                                          ...r,
+                                          branch2Question: {
+                                            ...r.branch2Question,
+                                            text,
+                                          },
+                                        }
+                                      : r
+                                ),
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      deleteBranch2Question: (categoryId, optionId, branch1ResponseId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                responseOptions: o.branch1Question.responseOptions.map(
+                                  (r) =>
+                                    r.id === branch1ResponseId
+                                      ? { ...r, branch2Question: undefined }
+                                      : r
+                                ),
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      addBranch2ResponseOption: (categoryId, optionId, branch1ResponseId, label) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                responseOptions: o.branch1Question.responseOptions.map(
+                                  (r) =>
+                                    r.id === branch1ResponseId && r.branch2Question
+                                      ? {
+                                          ...r,
+                                          branch2Question: {
+                                            ...r.branch2Question,
+                                            responseOptions: [
+                                              ...r.branch2Question.responseOptions,
+                                              { id: generateId(), label },
+                                            ],
+                                          },
+                                        }
+                                      : r
+                                ),
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      updateBranch2ResponseOption: (
+        categoryId,
+        optionId,
+        branch1ResponseId,
+        responseId,
+        label
+      ) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                responseOptions: o.branch1Question.responseOptions.map(
+                                  (r) =>
+                                    r.id === branch1ResponseId && r.branch2Question
+                                      ? {
+                                          ...r,
+                                          branch2Question: {
+                                            ...r.branch2Question,
+                                            responseOptions:
+                                              r.branch2Question.responseOptions.map((ro) =>
+                                                ro.id === responseId
+                                                  ? { ...ro, label }
+                                                  : ro
+                                              ),
+                                          },
+                                        }
+                                      : r
+                                ),
+                              },
+                            }
+                          : o
+                      ),
+                    },
+                  }
+                : c
+            ),
+          },
+        })),
+
+      deleteBranch2ResponseOption: (categoryId, optionId, branch1ResponseId, responseId) =>
+        set((state) => ({
+          tree: {
+            ...state.tree,
+            categories: state.tree.categories.map((c) =>
+              c.id === categoryId
+                ? {
+                    ...c,
+                    entryQuestion: {
+                      ...c.entryQuestion,
+                      responseOptions: c.entryQuestion.responseOptions.map((o) =>
+                        o.id === optionId && o.branch1Question
+                          ? {
+                              ...o,
+                              branch1Question: {
+                                ...o.branch1Question,
+                                responseOptions: o.branch1Question.responseOptions.map(
+                                  (r) =>
+                                    r.id === branch1ResponseId && r.branch2Question
+                                      ? {
+                                          ...r,
+                                          branch2Question: {
+                                            ...r.branch2Question,
+                                            responseOptions:
+                                              r.branch2Question.responseOptions.filter(
+                                                (ro) => ro.id !== responseId
+                                              ),
+                                          },
+                                        }
+                                      : r
+                                ),
                               },
                             }
                           : o

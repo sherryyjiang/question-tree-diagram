@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface TreeNodeProps {
   id: string;
   label: string;
-  type: 'entry' | 'response' | 'branch' | 'exploration' | 'dimension' | 'probe';
+  type: 'entry' | 'response' | 'branch' | 'branch2' | 'exploration' | 'dimension' | 'probe';
   isFixed?: boolean;
   onUpdate: (value: string) => void;
   onDelete?: () => void;
@@ -19,6 +19,7 @@ const typeStyles = {
   entry: 'bg-amber-900/60 border-amber-600/60 text-amber-100',
   response: 'bg-slate-800/80 border-slate-600/60 text-slate-100',
   branch: 'bg-blue-900/60 border-blue-600/60 text-blue-100',
+  branch2: 'bg-indigo-900/60 border-indigo-600/60 text-indigo-100',
   exploration: 'bg-emerald-900/60 border-emerald-600/60 text-emerald-100 border-dashed',
   dimension: 'bg-teal-900/60 border-teal-600/60 text-teal-100 border-dashed',
   probe: 'bg-violet-900/60 border-violet-600/60 text-violet-100 border-dashed',
@@ -28,6 +29,7 @@ const typeLabels = {
   entry: 'EQ',
   response: '',
   branch: 'B1',
+  branch2: 'B2',
   exploration: '~',
   dimension: '',
   probe: '',

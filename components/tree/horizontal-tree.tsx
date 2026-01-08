@@ -30,6 +30,12 @@ export function HorizontalTree() {
     addBranch1ResponseOption,
     updateBranch1ResponseOption,
     deleteBranch1ResponseOption,
+    addBranch2Question,
+    updateBranch2Question,
+    deleteBranch2Question,
+    addBranch2ResponseOption,
+    updateBranch2ResponseOption,
+    deleteBranch2ResponseOption,
     updateExplorationGoal,
     addBehavioralDimension,
     updateBehavioralDimension,
@@ -184,7 +190,11 @@ export function HorizontalTree() {
           </div>
           <div className="flex items-center gap-1">
             <span className="w-3 h-3 rounded bg-blue-900/60 border border-blue-600/60" />
-            <span>Branch Q</span>
+            <span>Branch 1 Q</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded bg-indigo-900/60 border border-indigo-600/60" />
+            <span>Branch 2 Q</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="w-3 h-3 rounded bg-emerald-900/60 border border-emerald-600/60 border-dashed" />
@@ -240,6 +250,12 @@ export function HorizontalTree() {
                 addBranch1ResponseOption={addBranch1ResponseOption}
                 updateBranch1ResponseOption={updateBranch1ResponseOption}
                 deleteBranch1ResponseOption={deleteBranch1ResponseOption}
+                addBranch2Question={addBranch2Question}
+                updateBranch2Question={updateBranch2Question}
+                deleteBranch2Question={deleteBranch2Question}
+                addBranch2ResponseOption={addBranch2ResponseOption}
+                updateBranch2ResponseOption={updateBranch2ResponseOption}
+                deleteBranch2ResponseOption={deleteBranch2ResponseOption}
                 updateExplorationGoal={updateExplorationGoal}
                 addBehavioralDimension={addBehavioralDimension}
                 updateBehavioralDimension={updateBehavioralDimension}
@@ -288,6 +304,12 @@ interface CategoryTreeProps {
   addBranch1ResponseOption: (categoryId: string, optionId: string, label: string) => void;
   updateBranch1ResponseOption: (categoryId: string, optionId: string, responseId: string, label: string) => void;
   deleteBranch1ResponseOption: (categoryId: string, optionId: string, responseId: string) => void;
+  addBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string) => void;
+  updateBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string, text: string) => void;
+  deleteBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string) => void;
+  addBranch2ResponseOption: (categoryId: string, optionId: string, branch1ResponseId: string, label: string) => void;
+  updateBranch2ResponseOption: (categoryId: string, optionId: string, branch1ResponseId: string, responseId: string, label: string) => void;
+  deleteBranch2ResponseOption: (categoryId: string, optionId: string, branch1ResponseId: string, responseId: string) => void;
   updateExplorationGoal: (categoryId: string, optionId: string, goal: string) => void;
   addBehavioralDimension: (categoryId: string, optionId: string, name: string) => void;
   updateBehavioralDimension: (categoryId: string, optionId: string, dimensionId: string, name: string) => void;
@@ -310,6 +332,12 @@ function CategoryTree({
   addBranch1ResponseOption,
   updateBranch1ResponseOption,
   deleteBranch1ResponseOption,
+  addBranch2Question,
+  updateBranch2Question,
+  deleteBranch2Question,
+  addBranch2ResponseOption,
+  updateBranch2ResponseOption,
+  deleteBranch2ResponseOption,
   updateExplorationGoal,
   addBehavioralDimension,
   updateBehavioralDimension,
@@ -348,6 +376,12 @@ function CategoryTree({
             addBranch1ResponseOption={addBranch1ResponseOption}
             updateBranch1ResponseOption={updateBranch1ResponseOption}
             deleteBranch1ResponseOption={deleteBranch1ResponseOption}
+            addBranch2Question={addBranch2Question}
+            updateBranch2Question={updateBranch2Question}
+            deleteBranch2Question={deleteBranch2Question}
+            addBranch2ResponseOption={addBranch2ResponseOption}
+            updateBranch2ResponseOption={updateBranch2ResponseOption}
+            deleteBranch2ResponseOption={deleteBranch2ResponseOption}
             updateExplorationGoal={updateExplorationGoal}
             addBehavioralDimension={addBehavioralDimension}
             updateBehavioralDimension={updateBehavioralDimension}
@@ -398,6 +432,12 @@ interface ResponseBranchProps {
   addBranch1ResponseOption: (categoryId: string, optionId: string, label: string) => void;
   updateBranch1ResponseOption: (categoryId: string, optionId: string, responseId: string, label: string) => void;
   deleteBranch1ResponseOption: (categoryId: string, optionId: string, responseId: string) => void;
+  addBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string) => void;
+  updateBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string, text: string) => void;
+  deleteBranch2Question: (categoryId: string, optionId: string, branch1ResponseId: string) => void;
+  addBranch2ResponseOption: (categoryId: string, optionId: string, branch1ResponseId: string, label: string) => void;
+  updateBranch2ResponseOption: (categoryId: string, optionId: string, branch1ResponseId: string, responseId: string, label: string) => void;
+  deleteBranch2ResponseOption: (categoryId: string, optionId: string, branch1ResponseId: string, responseId: string) => void;
   updateExplorationGoal: (categoryId: string, optionId: string, goal: string) => void;
   addBehavioralDimension: (categoryId: string, optionId: string, name: string) => void;
   updateBehavioralDimension: (categoryId: string, optionId: string, dimensionId: string, name: string) => void;
@@ -423,6 +463,12 @@ function ResponseBranch({
   addBranch1ResponseOption,
   updateBranch1ResponseOption,
   deleteBranch1ResponseOption,
+  addBranch2Question,
+  updateBranch2Question,
+  deleteBranch2Question,
+  addBranch2ResponseOption,
+  updateBranch2ResponseOption,
+  deleteBranch2ResponseOption,
   updateExplorationGoal,
   addBehavioralDimension,
   updateBehavioralDimension,
@@ -434,6 +480,7 @@ function ResponseBranch({
   const entryNodeId = `entry-${categoryId}`;
   const respNodeId = `resp-${option.id}`;
   const branch1 = option.branch1Question;
+  const branch1Responses = branch1?.responseOptions || [];
   const exploration = branch1?.explorationArea;
   const dimensions = exploration?.behavioralDimensions || [];
 
@@ -497,7 +544,11 @@ function ResponseBranch({
               registerNode(
                 `branch-${branch1.id}`,
                 el,
-                exploration ? [`exp-${exploration.id}`] : []
+                branch1Responses.length > 0
+                  ? branch1Responses.map((r) => `b1resp-${r.id}`)
+                  : exploration
+                  ? [`exp-${exploration.id}`]
+                  : []
               )
             }
           >
@@ -514,6 +565,114 @@ function ResponseBranch({
           <div className="h-7" />
         )}
       </div>
+
+      {/* Branch 1 Response Options with Branch 2 */}
+      {branch1Responses.length > 0 && (
+        <div className="flex flex-col gap-1 shrink-0">
+          {branch1Responses.map((b1resp) => {
+            const branch2 = b1resp.branch2Question;
+            const branch2Responses = branch2?.responseOptions || [];
+            return (
+              <div key={b1resp.id} className="flex items-start gap-4">
+                {/* Branch 1 Response */}
+                <div className="w-[120px] shrink-0">
+                  <div
+                    ref={(el) =>
+                      registerNode(
+                        `b1resp-${b1resp.id}`,
+                        el,
+                        branch2 ? [`branch2-${branch2.id}`] : []
+                      )
+                    }
+                  >
+                    <TreeNode
+                      id={`b1resp-${b1resp.id}`}
+                      label={b1resp.label}
+                      type="response"
+                      onUpdate={(label) =>
+                        updateBranch1ResponseOption(categoryId, option.id, b1resp.id, label)
+                      }
+                      onDelete={() =>
+                        deleteBranch1ResponseOption(categoryId, option.id, b1resp.id)
+                      }
+                      onAdd={() => addBranch2Question(categoryId, option.id, b1resp.id)}
+                    />
+                  </div>
+                </div>
+
+                {/* Branch 2 Question */}
+                {branch2 && (
+                  <>
+                    <div className="w-[150px] shrink-0">
+                      <div
+                        ref={(el) =>
+                          registerNode(
+                            `branch2-${branch2.id}`,
+                            el,
+                            branch2Responses.map((r) => `b2resp-${r.id}`)
+                          )
+                        }
+                      >
+                        <TreeNode
+                          id={`branch2-${branch2.id}`}
+                          label={branch2.text}
+                          type="branch2"
+                          isFixed
+                          onUpdate={(text) =>
+                            updateBranch2Question(categoryId, option.id, b1resp.id, text)
+                          }
+                          onDelete={() =>
+                            deleteBranch2Question(categoryId, option.id, b1resp.id)
+                          }
+                          onAdd={() =>
+                            addBranch2ResponseOption(categoryId, option.id, b1resp.id, 'New response')
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {/* Branch 2 Response Options */}
+                    {branch2Responses.length > 0 && (
+                      <div className="flex flex-col gap-1">
+                        {branch2Responses.map((b2resp) => (
+                          <div
+                            key={b2resp.id}
+                            className="w-[110px] shrink-0"
+                            ref={(el) => registerNode(`b2resp-${b2resp.id}`, el)}
+                          >
+                            <TreeNode
+                              id={`b2resp-${b2resp.id}`}
+                              label={b2resp.label}
+                              type="response"
+                              onUpdate={(label) =>
+                                updateBranch2ResponseOption(
+                                  categoryId,
+                                  option.id,
+                                  b1resp.id,
+                                  b2resp.id,
+                                  label
+                                )
+                              }
+                              onDelete={() =>
+                                deleteBranch2ResponseOption(
+                                  categoryId,
+                                  option.id,
+                                  b1resp.id,
+                                  b2resp.id
+                                )
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Exploration Goal */}
       <div className="w-[180px] shrink-0">

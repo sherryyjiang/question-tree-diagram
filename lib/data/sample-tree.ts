@@ -18,8 +18,36 @@ export const sampleTree: QuestionTree = {
               type: 'context-gathering',
               isFixed: true,
               responseOptions: [
-                { id: 'b1ro-1', label: 'Near work' },
-                { id: 'b1ro-2', label: 'Near home' },
+                {
+                  id: 'b1ro-1',
+                  label: 'Near work',
+                  branch2Question: {
+                    id: 'b2q-1',
+                    text: 'How often does this happen during work hours?',
+                    type: 'context-gathering',
+                    isFixed: true,
+                    responseOptions: [
+                      { id: 'b2ro-1', label: 'Daily' },
+                      { id: 'b2ro-2', label: 'Few times a week' },
+                      { id: 'b2ro-3', label: 'Rarely' },
+                    ],
+                  },
+                },
+                {
+                  id: 'b1ro-2',
+                  label: 'Near home',
+                  branch2Question: {
+                    id: 'b2q-2',
+                    text: 'Is this a morning or evening routine?',
+                    type: 'context-gathering',
+                    isFixed: true,
+                    responseOptions: [
+                      { id: 'b2ro-4', label: 'Morning ritual' },
+                      { id: 'b2ro-5', label: 'Evening wind-down' },
+                      { id: 'b2ro-6', label: 'Both' },
+                    ],
+                  },
+                },
                 { id: 'b1ro-3', label: 'Out and about' },
               ],
               explorationArea: {

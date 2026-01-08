@@ -33,6 +33,20 @@ export interface BranchQuestion {
 export interface BranchResponseOption {
   id: string;
   label: string;
+  branch2Question?: Branch2Question;
+}
+
+export interface Branch2Question {
+  id: string;
+  text: string;
+  type: 'context-gathering' | 'evaluative';
+  isFixed: boolean;
+  responseOptions: Branch2ResponseOption[];
+}
+
+export interface Branch2ResponseOption {
+  id: string;
+  label: string;
 }
 
 export interface ExplorationArea {
