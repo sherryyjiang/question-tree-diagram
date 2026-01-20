@@ -1,5 +1,5 @@
-import { CanvasTree } from '@/components/tree/canvas-tree';
+import { AppLayout } from '@/components/layout/app-layout';
 
 export default function Home() {
-  return <CanvasTree />;
+  return <AppLayout />;
 }
